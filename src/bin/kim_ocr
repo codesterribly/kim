@@ -26,7 +26,8 @@ FILE="";
 let "nbfiles = $# "
 
 test -n "$KDEHOME" || KDEHOME="`qtpaths --paths GenericDataLocation`"; export KDEHOME
-TMPDIR=`mktemp -d "$KDEHOME"/tmp-"$HOSTNAME"/kim.XXXXXXXX` || exit 1
+# Need real tmp dir, not relying on KDEHOME
+TMPDIR=$(mktemp -d "${TMPDIR:-/tmp}"/kim.XXXXXXXX) || exit 1
 echo $TMPDIR
 title=`gettext "Kim Convert to text"`
 init=`gettext "Initializing"`
@@ -56,5 +57,6 @@ for i in "$@";do
  		qdbus  $dbusRef showCancelButton true 		
 	fi;
 done
-#rm -Rf $TMPDIR
+# tmp dir cleanup
+[ -z "$KIM_DEBUG_KEEP_TMP" ] && rm -rf "$TMPDIR"
 qdbus  $dbusRef close
